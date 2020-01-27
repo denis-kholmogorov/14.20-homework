@@ -17,12 +17,12 @@ public class DBConnection
             try {
                 connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/" + dbName +
-                    "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" +
+                    "?useServerPrepStmts=false&rewriteBatchedStatements=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC" +
                              "&user=" + dbUser + "&password=" + dbPass);
 
                 if(!exit) {
-                    connection.createStatement().execute("DROP TABLE IF EXISTS voter_count");
-                    connection.createStatement().execute("CREATE TABLE voter_count(" +
+                    connection.createStatement().execute("DROP TABLE IF EXISTS voter_count_18");
+                    connection.createStatement().execute("CREATE TABLE voter_count_18(" +
                             "id INT NOT NULL AUTO_INCREMENT, " +
                             "name VARCHAR(50) NOT NULL, " +
                             "birthDate DATE NOT NULL, " +
@@ -42,46 +42,13 @@ public class DBConnection
         Statement stmt = getConnection().createStatement();
         String sql = "INSERT INTO voter_count(name, birthDate, count) " +
                 "VALUES" + builder.toString() +
-                " ON DUPLICATE KEY UPDATE count = count + 1";
+               " ON DUPLICATE KEY UPDATE count = count + 1";
         stmt.addBatch(sql);
         stmt.executeBatch();
+        stmt.close();
         count++;
-        System.out.print("объем сделанных записей = " + (count * 200000));
-        /*String sql = "INSERT INTO voter_count(name, birthDate, count) " +
-                "VALUES" + builder.toString() +
-                "ON DUPLICATE KEY UPDATE count = values(count) + 1";
-        synchronized (DBConnection.class) {
-            DBConnection.getConnection().createStatement().execute(sql);
-        }*/
+        System.out.println("объем сделанных записей = " + (count * 350000));
     }
-
-    /*public synchronized static void countVoter(String name, String birthDay) throws SQLException
-    {
-        builder.append((builder.length()==0 ? "" : ",") +
-                "('" + name + "', '" + birthDay + "',1)");*/
-
-
-
-
-
-       /* DBConnection.getConnection().createStatement()
-                .execute(sql);*/
-
-
-        /*ResultSet rs = DBConnection.getConnection().createStatement().executeQuery(sql);
-        if(!rs.next())
-        {
-            DBConnection.getConnection().createStatement()
-                    .execute("INSERT INTO voter_count(name, birthDate, `count`) VALUES('" +
-                            name + "', '" + birthDay + "', 1)");
-        }
-        else {
-            Integer id = rs.getInt("id");
-            DBConnection.getConnection().createStatement()
-                    .execute("UPDATE voter_count SET `count`=`count`+1 WHERE id=" + id);
-        }
-        rs.close();*/
-
 
     public static void printVoterCounts() throws SQLException
     {
@@ -92,5 +59,12 @@ public class DBConnection
             System.out.println("\t" + rs.getString("name") + " (" +
                     rs.getString("birthDate") + ") - " + rs.getInt("count"));
         }
+        String sql1 = "SELECT count(*) FROM voter_count WHERE count > 1";
+        ResultSet rs1 = DBConnection.getConnection().createStatement().executeQuery(sql1);
+        rs.close();
     }
 }
+
+/* Время парсинга - 513551
+объем сделанных записей = 12500000
+37 MB занимает парсер SAXParser после оптимизации */
