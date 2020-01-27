@@ -2,6 +2,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,9 +23,14 @@ public class XMLHandlerString extends DefaultHandler
         return voterCount;
     }
 
+    public int getSizeVoterCount(){
+        return voterCount.size();
+    }
+
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
     {
+        String[] nameAndDate;
         try
         {
             if(qName.equals("voter") && voter == null)
@@ -35,12 +41,21 @@ public class XMLHandlerString extends DefaultHandler
             else if(qName.equals("visit") && voter != null)
             {
                 short count = voterCount.getOrDefault(voter, (short)0);
-                voterCount.put(voter, ++count);
+
+                if(voterCount.size() == 50000){
+
+                    /*for (String key : voterCount.keySet()) {
+                        nameAndDate = key.split(" \\| ");
+                        DBConnection.countVoter(nameAndDate[0], nameAndDate[1]);
+                    }
+                    DBConnection.executeMultiInsert();*/
+                    voterCount.clear();
+                }
             }
             else{
                 throw new RuntimeException();
             }
-        }catch (ParseException | RuntimeException e){
+        }catch (ParseException | RuntimeException | InterruptedException e){
             e.getMessage();
         }
     }
