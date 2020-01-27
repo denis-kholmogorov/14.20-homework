@@ -8,6 +8,7 @@ public class DBConnection
     private static String dbName = "learn";
     private static String dbUser = "root";
     private static String dbPass = "23019088";
+    private static int count = 0;
 
     public static Connection getConnection()
     {
@@ -38,12 +39,20 @@ public class DBConnection
     }
 
     public static void executeMultiInsert(StringBuilder builder) throws SQLException {
+        Statement stmt = getConnection().createStatement();
         String sql = "INSERT INTO voter_count(name, birthDate, count) " +
+                "VALUES" + builder.toString() +
+                " ON DUPLICATE KEY UPDATE count = count + 1";
+        stmt.addBatch(sql);
+        stmt.executeBatch();
+        count++;
+        System.out.print("объем сделанных записей = " + (count * 200000));
+        /*String sql = "INSERT INTO voter_count(name, birthDate, count) " +
                 "VALUES" + builder.toString() +
                 "ON DUPLICATE KEY UPDATE count = values(count) + 1";
         synchronized (DBConnection.class) {
             DBConnection.getConnection().createStatement().execute(sql);
-        }
+        }*/
     }
 
     /*public synchronized static void countVoter(String name, String birthDay) throws SQLException
