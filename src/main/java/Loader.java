@@ -31,19 +31,20 @@ public class Loader
         // Оптимизтрованный
         long usageS = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         parser.parse(new File(fileName), handlerString);
+        handlerString.insertData(handlerString.getBuilder());
         usageS = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - usageS)/1024/1024;
         System.out.println(usageS + " MB занимает парсер SAXParser после оптимизации \n");
-        String [] nameAndDate;
-        if(handlerString.getSizeVoterCount() > 0) {
+       // String [] nameAndDate;
+       /* if(handlerString.getSizeVoterCount() > 0) {
             for (String key : handlerString.getVoterCount().keySet()) {
                 nameAndDate = key.split(" \\| ");
                 builder.append((builder.length()==0 ? "" : ",") +
                         "('" + nameAndDate[0] + "', '" + nameAndDate[1] + "',1)");
                 //DBConnection.countVoter(nameAndDate[0], nameAndDate[1]);
             }
-        }
+        }*/
         long a = System.currentTimeMillis();
-        DBConnection.executeMultiInsert(builder);
+       // DBConnection.executeMultiInsert(builder);
         System.out.println(System.currentTimeMillis() - a);
         handlerString.DuplicatedVotersString();
         DBConnection.printVoterCounts();
