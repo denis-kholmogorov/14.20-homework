@@ -41,7 +41,7 @@ public class XMLHandlerString extends DefaultHandler
                 count++;
                 builder.append((builder.length()==0 ? "" : ",") +
                         "('" + voterName + "', '" + voterDate + "',1)");
-                if(count == 350000) {
+                if(count == 300000) {
                     DBConnection.executeMultiInsert(builder);
                     builder = new StringBuilder();
                     count=0;
@@ -62,6 +62,9 @@ public class XMLHandlerString extends DefaultHandler
         {
             isVoter = false;
         }
+    }
+    public static int getCount(){
+        return count;
     }
 
 }

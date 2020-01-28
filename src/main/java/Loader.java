@@ -14,7 +14,7 @@ public class Loader
 
     public static void main(String[] args) throws Exception
     {
-        String fileName = "res/data-1572M.xml";
+        String fileName = "res/data-18M.xml";
         System.out.println("Начало цикла");
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser = factory.newSAXParser();
@@ -30,7 +30,8 @@ public class Loader
         usageS = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - usageS)/1024/1024;
         System.out.println(usageS + " MB занимает парсер SAXParser после оптимизации \n");
 
-        DBConnection.printVoterCounts();
+        SelectThread.createAndSrart();
+
 
     }
 }

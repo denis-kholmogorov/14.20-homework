@@ -45,8 +45,7 @@ public class DBConnection
         stmt.addBatch(sql);
         stmt.executeBatch();
         stmt.close();
-        count++;
-        System.out.println("объем сделанных записей = " + (count * 350000));
+        System.out.println("объем сделанных записей = " + (count + XMLHandlerString.getCount()));
     }
 
     public static void printVoterCounts() throws SQLException
