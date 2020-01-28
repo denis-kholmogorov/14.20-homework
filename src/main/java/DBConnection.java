@@ -7,7 +7,7 @@ public class DBConnection
     private static boolean exit = false;
     private static String dbName = "learn";
     private static String dbUser = "root";
-    private static String dbPass = "23019088";
+    private static String dbPass = "";
     private static int count = 0;
 
     public static Connection getConnection()
