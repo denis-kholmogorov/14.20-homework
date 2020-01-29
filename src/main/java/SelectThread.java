@@ -17,23 +17,10 @@ public class SelectThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("начал работу " + Thread.currentThread().getName());
-        String sql = "SELECT name, birthDate, count FROM voter_count WHERE count > 1";
-        ResultSet rs;
-        try
-        {
-            rs = DBConnection.getConnection().createStatement().executeQuery(sql);
-        while(rs.next())
-        {
-            System.out.println("\t" + rs.getString("name") + " (" +
-                    rs.getString("birthDate") + ") - " + rs.getInt("count"));
+        try {
+            DBConnection.printVoterCounts();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        rs.close();
-        }
-        catch (SQLException e)
-        {
-        e.printStackTrace();
-    }
-
     }
 }

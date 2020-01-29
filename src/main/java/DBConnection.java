@@ -9,6 +9,9 @@ public class DBConnection
     private static String dbPass = "23019088";
     private static int count = 0;
 
+    static {
+
+    }
     public static Connection getConnection()
     {
         if(connection == null )
@@ -46,6 +49,7 @@ public class DBConnection
         stmt.executeBatch();
         stmt.close();
         System.out.println("объем сделанных записей = " + (count + XMLHandlerString.getCount()));
+        System.out.println(Thread.currentThread().getName());
     }
 
     public static void printVoterCounts() throws SQLException

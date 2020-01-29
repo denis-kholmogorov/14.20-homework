@@ -2,13 +2,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class XMLHandlerString extends DefaultHandler
 {
@@ -16,10 +15,13 @@ public class XMLHandlerString extends DefaultHandler
     private static SimpleDateFormat birthDayFormat = new SimpleDateFormat("yyyy.MM.dd");
     private String voterName;
     private String voterDate;
+    private static boolean first = true;
     private static int count = 0;
-    private StringBuilder builder = new StringBuilder();
+    private static StringBuilder builder = new StringBuilder();
+    private static ExecutorService executor = Executors.newFixedThreadPool(2);
 
-    public StringBuilder getBuilder(){
+
+    public static StringBuilder getBuilder(){
         return builder;
     }
 
@@ -41,16 +43,24 @@ public class XMLHandlerString extends DefaultHandler
                 count++;
                 builder.append((builder.length()==0 ? "" : ",") +
                         "('" + voterName + "', '" + voterDate + "',1)");
-                if(count == 300000) {
-                    DBConnection.executeMultiInsert(builder);
+                if(!first && count == 30000)
+                {
+                    executor.submit(new InsertThread(builder));
                     builder = new StringBuilder();
                     count=0;
+                }
+                else if(first && count == 30000)
+                {
+                    executor.submit(new InsertThread(builder));
+                    builder = new StringBuilder();
+                    count=0;
+                    first = false;
                 }
             }
             else{
                 throw new RuntimeException();
             }
-        }catch (ParseException | RuntimeException | SQLException e){
+        }catch (ParseException | RuntimeException e){
             e.getMessage();
         }
     }
@@ -65,6 +75,10 @@ public class XMLHandlerString extends DefaultHandler
     }
     public static int getCount(){
         return count;
+    }
+
+    public static ExecutorService getExecutor(){
+        return executor;
     }
 
 }
