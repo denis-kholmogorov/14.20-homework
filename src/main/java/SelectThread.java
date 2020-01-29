@@ -2,18 +2,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-public class SelectThread implements Runnable {
-    Thread thread;
-
-    public SelectThread()
-    {
-        thread = new Thread(this);
-    }
-    public static SelectThread createAndSrart(){
-        SelectThread selectThread = new SelectThread();
-        selectThread.thread.start();
-        return selectThread;
-    }
+public class SelectThread extends Thread {
 
     @Override
     public void run() {

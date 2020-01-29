@@ -1,13 +1,9 @@
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class XMLHandlerString extends DefaultHandler
 {
@@ -15,15 +11,8 @@ public class XMLHandlerString extends DefaultHandler
     private static SimpleDateFormat birthDayFormat = new SimpleDateFormat("yyyy.MM.dd");
     private String voterName;
     private String voterDate;
-    private static boolean first = true;
     private static int count = 0;
     private static StringBuilder builder = new StringBuilder();
-    private static ExecutorService executor = Executors.newFixedThreadPool(2);
-
-
-    public static StringBuilder getBuilder(){
-        return builder;
-    }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
@@ -32,7 +21,6 @@ public class XMLHandlerString extends DefaultHandler
         {
             if(qName.equals("voter") && isVoter == false)
             {
-
                 Date birthDay = birthDayFormat.parse(attributes.getValue("birthDay"));
                 voterName = attributes.getValue("name");
                 voterDate = birthDayFormat.format(birthDay).replace(".", "-");
@@ -43,18 +31,12 @@ public class XMLHandlerString extends DefaultHandler
                 count++;
                 builder.append((builder.length()==0 ? "" : ",") +
                         "('" + voterName + "', '" + voterDate + "',1)");
-                if(!first && count == 30000)
+
+                if(count == 30000)
                 {
-                    executor.submit(new InsertThread(builder));
+                    SQLExecutors.SQLExecutorsInsert(builder);
                     builder = new StringBuilder();
                     count=0;
-                }
-                else if(first && count == 30000)
-                {
-                    executor.submit(new InsertThread(builder));
-                    builder = new StringBuilder();
-                    count=0;
-                    first = false;
                 }
             }
             else{
@@ -73,12 +55,15 @@ public class XMLHandlerString extends DefaultHandler
             isVoter = false;
         }
     }
-    public static int getCount(){
+
+    public static int getCount()
+    {
         return count;
     }
 
-    public static ExecutorService getExecutor(){
-        return executor;
+    public static StringBuilder getBuilder()
+    {
+        return builder;
     }
 
 }

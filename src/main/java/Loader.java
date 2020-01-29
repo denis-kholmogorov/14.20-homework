@@ -1,18 +1,9 @@
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
 
 public class Loader
 {
-    private static StringBuilder builder = new StringBuilder();
-    private static SimpleDateFormat birthDayFormat = new SimpleDateFormat("yyyy.MM.dd");
-    private static SimpleDateFormat visitDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-
-    private static HashMap<Voter, Integer> voterCounts = new HashMap<>();
-
     static {
         DBConnection.getConnection();
     }
@@ -30,17 +21,13 @@ public class Loader
         long a = System.currentTimeMillis();
         parser.parse(new File(fileName), handlerString);
         System.out.println(" Время парсинга - " + (System.currentTimeMillis() - a));
-        ExecutorService executorService = XMLHandlerString.getExecutor();
-        executorService.submit(new InsertThread(XMLHandlerString.getBuilder()));
-        //DBConnection.executeMultiInsert(handlerString.getBuilder());
-
+        SQLExecutors.SQLExecutorsInsert(XMLHandlerString.getBuilder());
 
         usageS = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() - usageS)/1024/1024;
         System.out.println(usageS + " MB занимает парсер SAXParser после оптимизации \n");
 
-        Thread.sleep(2000);
-        XMLHandlerString.getExecutor().submit(SelectThread.createAndSrart());
-        XMLHandlerString.getExecutor().shutdown();
+        SQLExecutors.SQLExecutorsSelect();
+        SQLExecutors.SQLExecutorsShutdown();
 
 
     }
